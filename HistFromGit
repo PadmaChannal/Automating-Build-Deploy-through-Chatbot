@@ -1,0 +1,106 @@
+function Send-RocketCatMessage {
+    param (
+        [Parameter(Mandatory=$true)][string]$messageText,
+        [Parameter(Mandatory=$true)][string]$roomWebHook,
+        [Parameter()][Switch]$Historical
+    )
+
+    $body = @{
+        username = "Deploy Monkey";
+        icon_emoji = ":monkey:";
+        text=$messageText;
+    }
+   
+    Invoke-RestMethod -Method Post -Uri $roomWebHook -ContentType "application/json" -Body (ConvertTo-Json $body) 
+}
+function Send-Msg {
+    param([string]$prompt)
+    Write-Host "$prompt -- empty (just hit enter) for no, 1 for yes";
+    return _Prompt
+}
+	
+function _Prompt {
+    param (
+        [Parameter(Mandatory=$true)][bool]$1OrNothing
+    )
+    return $1OrNothing
+}
+
+function Ask-TheMonkey {
+    param (
+        [string]$curSha,
+        [string]$curStagingSha
+    )
+    $roomHook = " "; # YOUR ROOM
+
+
+ 
+    #get octopus project information
+    $rel = Invoke-RestMethod -Uri  http://kwanzaabot/api/progression/Projects-1?apikey=XXX # YOUR OCTO API KEY
+    # the  versions look like 2017.630.3186-maste-r2591-d34f28a
+    $currentProdRelease = ($rel.Releases | Where-Object {[bool]($_.Deployments.PSobject.Properties.name -match "Environments-21")})[0].Release.Version
+    $currentStagingRelease = ($rel.Releases | Where-Object {[bool]($_.Deployments.PSobject.Properties.name -match "Environments-61")})[0].Release.Version 
+    if($curSha -eq $null -or $curSha -eq "") {
+        $curSha = $currentProdRelease.Substring($currentProdRelease.LastIndexOf("-")+1)
+    }
+    if($curStagingSha -eq $null -or $curStagingSha -eq "") {
+        $curStagingSha = $currentStagingRelease.Substring($currentStagingRelease.LastIndexOf("-")+1)
+    }
+
+    if($curSha -eq $curStagingSha) {
+        $prevProd = ($rel.Releases | Where-Object {[bool]($_.Deployments.PSobject.Properties.name -match "Environments-21")})[1];
+        Write-Output $prevProd;
+        $currentProdRelease = ($rel.Releases | Where-Object {[bool]($_.Deployments.PSobject.Properties.name -match "Environments-21")})[1].Release.Version
+        $curSha = $currentProdRelease.Substring($currentProdRelease.LastIndexOf("-")+1)
+        $Historical = $true;
+    }
+
+    Write-Output "Current Green: $curSha"
+    Write-Output "Current Staging: $curStagingSha"
+
+    #lets correlate octo deployment info with current git info
+
+    $getLog = "git log --oneline --first-parent origin/master $curSha..$curStagingSha"
+    Write-Output $getLog
+    $logData = Invoke-Expression $getLog
+    $cleanedLogData = $logData | % {
+        "``" + $_.Trim().Replace(" into 'master'","").Replace(" Merge branch "," ") + "``";
+    }
+
+    $getLog = "git log --oneline --first-parent origin/master $curStagingSha...origin/master"
+    Write-Output $getLog
+    $stagingLogData = Invoke-Expression $getLog
+    $cleanedStagingLogData = $stagingLogData | % {
+        "``" + $_.Trim().Replace(" into 'master'","").Replace(" Merge branch "," ") + "``";
+    }
+    if($cleanedStagingLogData.Length -gt 0) {
+        $cleanedLogData = Compare-Object -ReferenceObject $cleanedStagingLogData -DifferenceObject $cleanedLogData -PassThru
+        Write-Warning "There are commits on master that aren't in staging yet!"
+        $cleanedStagingLogData | % {
+           Write-Warning $_
+        }
+    }
+
+    $len = "_" + (@($cleanedLogData).Length) + "_"
+    if($Historical) {
+        $rocketCatMessage = "FYI, these $len merge requests just went live"
+    } else {
+        $rocketCatMessage = "There's $len undeployed merge requests. Any objections?"
+    }
+
+    $rmsg = $([String]::Join([Environment]::NewLine,$cleanedLogData))
+
+    Write-Output $rmsg
+    Write-Output $rocketCatMessage
+
+    
+        #Send-RocketCatMessage -messageText $rocketCatMessage -roomWebHook $roomHook
+        Send-RocketCatMessage -messageText ("$rocketCatMessage$([Environment]::NewLine)$rmsg") -roomWebHook $roomHook
+      
+          #  octo promote-release --project=ManagerBeta --from=Staging --to=Green
+        
+
+    
+}
+
+Ask-TheMonkey
