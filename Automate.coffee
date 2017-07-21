@@ -23,6 +23,7 @@ module.exports = (robot) ->
         res.send "Encountered an error :( #{err}"
         return
 	  res.send "Got back the body --> #{body}"
+adding more of sync http calls to handle Gitlab runner bottle neck
 
 	  
 
