@@ -3,7 +3,7 @@ module.exports = (robot) ->
     room = 'playing_with_hubot'
     robot.messageRoom room, "Started..."
     robot.messageRoom room, "Beginning "
-    robot.http('https://hyperchicken.m2.spreetail.org/api/v4/projects/11/pipelines?per_page=100').header('Accept', 'application/json').header('PRIVATE-TOKEN', 'xxx').get() (err, response, body) ->
+    robot.http('https://example.com/api/v4/projects/11/pipelines?per_page=100').header('Accept', 'application/json').header('PRIVATE-TOKEN', 'xxx').get() (err, response, body) ->
        robot.messageRoom room, 'Inside First HTTP'
        if err
          robot.messageRoom room, 'Error in Fist Call'
@@ -23,7 +23,7 @@ module.exports = (robot) ->
          if item.ref == 'master'
            masterRef = item.id
            robot.messageRoom room, ' The one with Ref = Master  ' + masterRef
-           robot.http('https://hyperchicken.m2.spreetail.org/api/v4/projects/11/pipelines/#{masterRef}/jobs').header('Accept', 'application/json').header('PRIVATE-TOKEN', 'xx-xx').get() (err, response, body) ->   
+           robot.http('https://example.com/api/v4/projects/11/pipelines/#{masterRef}/jobs').header('Accept', 'application/json').header('PRIVATE-TOKEN', 'xx-xx').get() (err, response, body) ->   
              robot.messageRoom room, 'Inside Second HTTP'
              if err
                 robot.messageRoom room, 'Error in Second call'
@@ -43,7 +43,7 @@ module.exports = (robot) ->
                 if item.name == 'execute_monkey'
                   jobId=item.id
                   robot.messageRoom room, 'The one with name as execute_monkey' +jobId
-                  robot.http('https://hyperchicken.m2.spreetail.org/api/v4/projects/11/jobs/#{jobId}/play').header('Accept', 'application/json').header('PRIVATE-TOKEN', 'xxxx').get() (err, response, body) ->
+                  robot.http('https://example.com/api/v4/projects/11/jobs/#{jobId}/play').header('Accept', 'application/json').header('PRIVATE-TOKEN', 'xxxx').get() (err, response, body) ->
                     robot.messageRoom room, 'Inside third API'
                     if err
                       robot.messageRoom room, 'Error in third call'
