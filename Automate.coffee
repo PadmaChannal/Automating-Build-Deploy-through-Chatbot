@@ -1,17 +1,4 @@
-# Description:
-#   Calling Git API.
-#
-# Dependecies:
-#   None
-#
-# Configuration:
-#   None
-#
-# Commands:
-#   hubot could you deploy - 
-#
-# Author:
-#   Padma Channal
+
 
 module.exports = (robot) ->
   robot.respond /could you deploy$/i,(res) ->
