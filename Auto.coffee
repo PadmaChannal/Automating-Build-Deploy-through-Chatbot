@@ -63,3 +63,11 @@ module.exports = (robot) ->
            break
          i++
 		    return
+		
+		
+####################
+Corresponding Curl Commands:
+1. curl --request POST --header "PRIVATE-TOKEN: XXX" -k "example.com//api/v4/projects/11/jobs/17278/retry"
+2. https://example.com/api/v3/projects?private_token=xxx
+3. curl --request POST --header "PRIVATE-TOKEN: xxx" -k "https://example.com//api/v4/projects/11/jobs/18618/play"
+####################
