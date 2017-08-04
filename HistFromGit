@@ -36,7 +36,7 @@ function Ask-TheMonkey {
 
  
     #get octopus project information
-    $rel = Invoke-RestMethod -Uri  http://kwanzaabot/api/progression/Projects-1?apikey=XXX # YOUR OCTO API KEY
+    $rel = Invoke-RestMethod -Uri  http://octodeploy/api/progression/Projects-1?apikey=XXX # YOUR OCTO API KEY
     # the  versions look like 2017.630.3186-maste-r2591-d34f28a
     $currentProdRelease = ($rel.Releases | Where-Object {[bool]($_.Deployments.PSobject.Properties.name -match "Environments-21")})[0].Release.Version
     $currentStagingRelease = ($rel.Releases | Where-Object {[bool]($_.Deployments.PSobject.Properties.name -match "Environments-61")})[0].Release.Version 
