@@ -2,7 +2,7 @@
 $apiKey = "" #Octopus API Key
 $OctopusURL = "http://kwanzaabot/" #Octopus URL
 
-$ProjectName = "m2metrics" #project name
+$ProjectName = "your Project Name" #project name
 $EnvironmentName = "Test" #environment name
 
 #$MachineName = "" #Machine name in Octopus. Accepts only 1 Machine.
