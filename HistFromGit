@@ -1,3 +1,4 @@
+#Intergrating with Rocket Chat
 function Send-RocketCatMessage {
     param (
         [Parameter(Mandatory=$true)][string]$messageText,
